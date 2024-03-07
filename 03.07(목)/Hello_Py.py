@@ -1,0 +1,1 @@
+print("Hello, Py 3.x! 내 이름은 김민상이고 개발환경은 Visual Studio Code 입니다.")

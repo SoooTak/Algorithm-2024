@@ -17,8 +17,8 @@ int main(void)
         b = temp;
     }
     max = gcd(a,b);
-    printf("%d¿Í %dÀÇ ÃÖ´ë°ø¾à¼ö : %d", a, b, max);
-    printf("\n±è¹Î»ó\n");
+    printf("%dì™€ %dì˜ ìµœëŒ€ê³µì•½ìˆ˜ : %d", a, b, max);
+    printf("\nê¹€ë¯¼ìƒ\n");
     system("pause");
     return 0;
 }

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <windows.h>
+#include <windows.h>    // VS Code Ctrl + F5로 실행시 cmd창이 바로 닫히는 현상으로 인해 system("pause"); 사용
 int gcd(int a,int b);
 int main(void)
 {

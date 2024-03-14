@@ -17,7 +17,7 @@ int main(void)
         b = temp;
     }
     max = gcd(a,b);
-    printf("%d와 %d의 최대 공약수 : %d", a, b, max);
+    printf("%d와 %d의 최대공약수 : %d", a, b, max);
     printf("\n김민상\n");
     system("pause");
     return 0;

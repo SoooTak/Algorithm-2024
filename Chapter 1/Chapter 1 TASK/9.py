@@ -4,18 +4,21 @@
 
 import math
 
+def equal (a, b, c) :
+    if (b*b - 4*a*c) > 0 :
+        x1 = (-b + math.sqrt(b**2 - 4*a*c)) / 2 * a
+        x2 = (-b - math.sqrt(b**2 - 4*a*c)) / 2 * a
+        print(f"x1 : {x1},   x2 : {x2}")
+
+    elif (b**2 - 4*a*c) == 0 :
+        x1 = (-b + math.sqrt(b**2 - 4*a*c)) / 2 * a
+        print(f"중근, x = {x1}")
+
+    else :
+        print("허근을 가짐")
+    
 a = int(input("a 입력 : "))
 b = int(input("b 입력 : "))
 c = int(input("c 입력 : "))
 
-if (b*b - 4*a*c) > 0 :
-    x1 = (-b + math.sqrt(b**2 - 4*a*c)) / 2 * a
-    x2 = (-b - math.sqrt(b**2 - 4*a*c)) / 2 * a
-    print(f"x1 : {x1},   x2 : {x2}")
-
-elif (b**2 - 4*a*c) == 0 :
-    x1 = (-b + math.sqrt(b**2 - 4*a*c)) / 2 * a
-    print(f"중근, x = {x1}")
-
-else :
-    print("허근을 가짐")
+equal(a,b,c)

@@ -1,0 +1,15 @@
+#202311388 김민상
+#Chapter 1
+#문제 12_알고리즘 개선
+
+min_distance(A)
+    //입력 : 숫자 배열 A[0..n-1]
+    //출력 : 두 항목간의 거리들 중의 최소 거리들
+    dmin <- (무한)
+    for i <- to n - 1 do
+        for j <- to n - 1 do
+            if i != j and 절댓값(A[i] - A[j]) < dmin
+                dmin <- 절댓값(A[i] - A[j])
+    return dmin
+
+해당 알고리즘 개선 : 배열을 정렬한 후 인접한 인덱스 끼리만 비교하면(a[i], a[i+1]) 이중 for문을 사용하지 않고도 표현 가능함.

@@ -1,0 +1,57 @@
+import math
+
+# 두 점 사이의 거리 계산
+def distance(p1, p2):
+    return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
+
+# 두 점의 거리를 비교하여 더 작은 거리 반환
+def min_distance(d1, d2):
+    return min(d1, d2)
+
+# 가장 가까운 두 점을 찾는 함수
+def closest_pair(points):
+    n = len(points)
+    if n <= 1:
+        return float('inf')  # 최소 거리를 양의 무한대로 초기화
+    elif n == 2:
+        return distance(points[0], points[1])
+    else:
+        points.sort()  # x 좌표에 따라 정렬
+        min_dist = float('inf')  # 초기 최소 거리를 양의 무한대로 설정
+        for i in range(n - 1):
+            for j in range(i + 1, min(i + 8, n)):
+                dist = distance(points[i], points[j])
+                min_dist = min_distance(min_dist, dist)
+        return min_dist
+
+# 스트립 내에서 가장 가까운 두 점의 거리 계산
+def strip_closest(strip, d):
+    min_dist = d
+    strip.sort(key=lambda point: point[1])  # y 좌표에 따라 정렬
+    for i in range(len(strip)):
+        j = i + 1
+        while j < len(strip) and (strip[j][1] - strip[i][1]) < min_dist:
+            min_dist = min_distance(distance(strip[i], strip[j]), min_dist)
+            j += 1
+    return min_dist
+
+# 최근접 쌍의 거리를 계산하는 함수
+def closet_pair_dist(P, n):
+    if n <= 3:
+        return closest_pair(P)
+    mid = n // 2
+    mid_x = P[mid][0]
+    dl = closet_pair_dist(P[:mid], mid)
+    dr = closet_pair_dist(P[mid:], n - mid)
+    d = min_distance(dl, dr)
+    Pm = []
+    for i in range(n):
+        if abs(P[i][0] - mid_x) < d:
+            Pm.append(P[i])
+    ds = strip_closest(Pm, d)
+    return min_distance(d, ds)
+
+# Example usage:
+p = [(2, 3), (12, 30), (40, 50), (5, 1), (12, 10), (3, 4)]
+n = len(p)
+print("가장 가까운 두 점의 거리:", closet_pair_dist(p, n))

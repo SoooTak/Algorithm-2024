@@ -1,0 +1,117 @@
+from queue import Queue
+def radix_sort(A) :
+    queues = []
+    for i in range(BUCKETS) :
+        queues.append(Queue())
+        
+    n = len(A)
+    factor = 1
+    for d in range(DIGITS) :
+        for i in range(n) :
+            queues[(A[i] // factor) % BUCKETS].put(A[i])
+        j = 0
+        for b in range(BUCKETS) :
+            while not queues[b].empty() :
+                A[j] = queues[b].get()
+                j += 1
+        factor *= BUCKETS
+        print("step", d+1, A)
+        
+import random
+BUCKETS = 10
+DIGITS = 4
+data = []
+for i in range(10) :
+    data.append(random.randint(1, 9999))
+radix_sort(data)
+print("radix: ", data)    
+
+def counting_sort(A) :
+    output = [0] * len(A)
+    count = [0] * MAX_VAL
+    
+    for i in A:
+        count[i] += 1
+    
+    for i in range(MAX_VAL) :
+        count[i] += count[i-1]
+        
+    for i in range(len(A)) :
+        output[count[A[i]]-1] = A[i]
+        count[A[i]] -= 1
+        
+    for i in range(len(A)) :
+        A[i] = output[i]
+    
+MAX_VAL = 10
+data = [1, 4, 1, 2, 7, 5, 2]
+print("original : ", data)
+counting_sort(data)
+print("counting : ", data)
+
+
+
+
+
+M = 13
+table = [None] * M
+def hashFn(key) :
+    return key % M
+
+def lp_insert(key) :
+    id = hashFn(key)
+    count = M
+    while count > 0 and (table[id] != None) :
+        id = (id + 1 + M) % M
+        count -= 1
+    if count > 0 :
+        table[id] = key
+    return
+
+
+def hashfn(key):
+    if isinstance(key, int):  # 키가 정수형인지 확인
+        key = str(key)
+    # 나머지 해시 함수 구현
+    hash_value = 0
+    for c in key:
+        hash_value = (hash_value * 31 + ord(c)) % M
+    return hash_value
+
+def lp_delete(key):
+    id = hashfn(key)
+    count = M
+    while count > 0:
+        if table[id] is None:
+            return
+        if table[id] != -1 and table[id] == key:
+            table[id] = -1  # 삭제 표시
+            return
+        id = (id + 1) % M
+        count -= 1
+
+
+
+
+print("최초 :", table)
+lp_insert(45)
+print("45 삽입 :", table)
+lp_insert(27)
+print("27 삽입 :", table)
+lp_insert(88)
+print("88 삽입 :", table)
+lp_insert(9)
+print("9 삽입 :", table)
+lp_insert(71)
+print("71 삽입 :", table)
+lp_insert(60)
+print("60 삽입 :", table)
+lp_insert(46)
+print("46 삽입 :", table)
+lp_insert(38)
+print("38 삽입 :", table)
+lp_insert(24)
+print("24 삽입 :", table)
+
+lp_delete(60)
+print("60 삭제 :", table)

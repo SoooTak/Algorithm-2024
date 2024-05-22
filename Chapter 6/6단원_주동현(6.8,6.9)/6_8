@@ -1,0 +1,10 @@
+def lp_delete(key):
+    id = hashfn(key)
+    count = M
+    while count >0:
+        if table[id]==None:return
+        if table[id] != -1 and table[id]==key:
+            table[id]
+            return
+        id=(id+1+M) % M
+        count -=1

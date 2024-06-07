@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import xml.etree.ElementTree as ET
 from datetime import datetime
 import os
+import pandas as pd
+from tabulate import tabulate
 
 # [1. 사용자로부터 도시명을 입력 받는 함수]
 def get_city_name():
@@ -144,8 +146,10 @@ def print_via_stops(city_code, route_id):
                 else:
                     a += 1
                     via_stops.append((current_stop, updowncd))  # 경유 정류장과 updowncd를 목록에 추가
-                    if updowncd is not None:
-                        print(f"{a}. {current_stop} (updowncd: {updowncd})")  # 현재 정류장과 updowncd 출력
+                    if (updowncd is not None) and (updowncd == 0):
+                        print(f"{a}. {current_stop} (상행)")  # 현재 정류장과 updowncd 출력
+                    elif (updowncd is not None) and (updowncd == 1):
+                        print(f"{a}. {current_stop} (하행)")  # 현재 정류장과 updowncd 출력
                     else:
                         print(f"{a}. {current_stop}")  # 현재 정류장 출력
                 prev_stop = current_stop  # 현재 정류장을 이전 정류장으로 업데이트
@@ -348,6 +352,8 @@ def print_routes_via_station(initial_sound, filenames):
                 print(f'{stop} (노선번호: {filename.split("_")[2].split(".")[0]}): {updowncd}')
 
 
+def display_menu():
+    print("노선번호 조회: 1, 찾은 노선 저장하기: 2, 찾은 노선 불러오기: 3, 저장된 정류장 찾기: 4, 정류 경유노선 조회: 5,종료: 0")
 
 # 메인 함수
 def main():
@@ -356,8 +362,9 @@ def main():
     route_number = None
 
     while True:
-        a = input("노선번호 조회: 1, 찾은 노선 저장하기: 2, 찾은 노선 불러오기: 3, 저장된 정류장 찾기: 4, 정류 경유노선 조회: 5,종료: 0\n").strip().lower()
-        
+        clear_screen()
+        display_menu()
+        a = input().strip().lower()
         if a == '0':
             print("프로그램을 종료합니다.")
             break
@@ -377,13 +384,15 @@ def main():
                         print(f'{city_name}의 노선번호 {route_number}에 해당하는 정류장 위치를 가져올 수 없습니다.')
                 else:
                     print(f'{city_name}의 도시 코드를 가져올 수 없습니다.')
+            input("계속하려면 아무 키나 누르세요...")
         elif a == '2':
-            # 가장 최근에 조회한 노선만을 저장
+
             if city_code and route_id and route_number:
                 filename = f'via_stops_{route_number}.txt'
                 save_via_stops(city_code, route_id, filename)
             else:
                 print("먼저 노선번호를 조회하세요.")
+            input("계속하려면 아무 키나 누르세요...")
         elif a == '3':
             route_number = input("로드할 노선번호를 입력하세요: ").strip()
             filename = f'via_stops_{route_number}.txt'
@@ -393,6 +402,7 @@ def main():
                     print(f'{stop}, {updowncd}')
             except FileNotFoundError:
                 print(f'{filename} 파일을 찾을 수 없습니다.')
+            input("계속하려면 아무 키나 누르세요...")
         elif a == '4':
             # 파일명에 via_stops가 포함된 모든 파일 찾기
             filenames = [filename for filename in os.listdir() if 'via_stops' in filename]
@@ -405,11 +415,16 @@ def main():
                     break
                 else:
                     print_routes_via_station(initial_sound, filenames)
+            input("계속하려면 아무 키나 누르세요...")
+
         elif a=='5':
+            
             city_name = input("도시명을 입력하세요(서울시 제외, 뒤로가기: 0 입력): ")
             
             city_code = get_city_code(city_name)
-            nodenm = str(input("정류장 이름 입력 (뒤로가기 : 0): "))
+
+            nodenm = str(input("정류장 이름 : "))
+            
             node_id = get_station_id(city_code, nodenm)
 
 
@@ -417,12 +432,16 @@ def main():
 
 
             bus_routes = get_bus_routes_via_station(city_code, node_id)
-            print(f"--------[{nodenm}]을 지나는 버스 목록 --------")
-            for route in bus_routes:
-                print(f"{route['routeno']:>5} :  [기점] {route['startnodenm']:<}   [종점] {route['endnodenm']:<}   [유형] {route['routetp']:<}")
 
+            
+            
+            df_test = pd.DataFrame(bus_routes)
+            print(tabulate(df_test, headers='keys', tablefmt='fancy_grid', showindex=True))
+                
+            input("계속하려면 아무 키나 누르세요...")
+            
         else:
             print("올바른 선택이 아닙니다. 다시 시도하세요.")
-
+        
 if __name__ == "__main__":
     main()

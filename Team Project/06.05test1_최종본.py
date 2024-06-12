@@ -282,10 +282,14 @@ def save_via_stops(city_code, route_id, filename):
 # [9. 파일이름으로 해당 파일이 존재할 때 파일 안 정류장 정보를 리스트로 저장해 반환하는 함수]
 def load_via_stops(filename):
     via_stops = []
-    with open(filename, 'r', encoding='utf-8') as file:
-        for line in file:
-            stop, updowncd = line.strip().split(', ')
-            via_stops.append((stop, updowncd))
+    try:
+        with open(filename, 'r', encoding='utf-8') as file:
+            for line in file:
+                stop, updowncd = line.strip().split(', ')
+                via_stops.append((stop, updowncd))
+    except FileNotFoundError:
+        print(f'{filename} 파일을 찾을 수 없습니다.')
+        return via_stops
     return via_stops
 
 # [10. 도시코드, 정류장이름으로 정류장id를 반환하는 함수]
@@ -345,26 +349,27 @@ def print_routes_via_station(initial_sound, filenames):
         via_stops = load_via_stops(filename)
         matched_stops = []  # 일치하는 정류장 정보를 저장할 리스트
 
-        # 파일에서 불러온 각 정류장 이름의 초성을 확인하고, 입력받은 초성과 완벽히 일치할 경우 리스트에 추가
+        # 파일에서 불러온 각 정류장 이름의 초성을 확인하고, 입력받은 초성에 포함되는 경우 리스트에 추가
         for stop, updowncd in via_stops:
-            if initial_sound == convert_to_initial_sound(stop):  # 입력받은 초성과 정류장 이름의 초성이 완벽히 일치하는 경우
+            if initial_sound in convert_to_initial_sound(stop):  # 입력받은 초성이 정류장 이름의 초성에 포함되는 경우
                 matched_stops.append((stop, updowncd))
         
         # 일치하는 정류장이 있는 경우에만 파일명(노선번호)과 정류장 정보 출력
         if matched_stops:
             print(f"\n파일명: {filename}")  # 일치하는 정류장이 있을 때만 파일명 출력
             for stop, updowncd in matched_stops:
-                if updowncd == '0' :
+                if updowncd == '0':
                     print(f'{stop} (노선번호: {filename.split("_")[2].split(".")[0]}): 상행')
-                elif updowncd == '1' :
+                elif updowncd == '1':
                     print(f'{stop} (노선번호: {filename.split("_")[2].split(".")[0]}): 하행')
+
 
 
 def display_menu():
     print("                                      [ 버스정보 API를 활용한 버스노선정보 저장 및 로드 프로그램 ]                                             ")
-    print("╒══════════════════╤═══════════════════════╤═════════════════════════════╤════════════════════════════════╤═════════════════════════╤═════════╕")
-    print("│ 버스정보 조회: 1 │ 찾은 버스정보 저장: 2 │ 저장한 버스정보 불러오기: 3 │ 저장한 정보에서 정류장 찾기: 4 │ 정류장 경유노선 조회: 5 │ 종료: 0 │")
-    print("╘══════════════════╧═══════════════════════╧═════════════════════════════╧════════════════════════════════╧═════════════════════════╧═════════╛")
+    print("╒══════════════════╤═══════════════════════╤════════════════════════════════╤════════════════════════════════════╤═════════════════════════╤═════════╕")
+    print("│ 버스정보 조회: 1 │ 버스 즐겨찾기 등록: 2 │ 즐겨찾기 버스 정보 불러오기: 3 │ 정류장 경유 즐겨찾기 노선 조회 : 4 │ 정류장 경유노선 조회: 5 │ 종료: 0 │")
+    print("╘══════════════════╧═══════════════════════╧════════════════════════════════╧════════════════════════════════════╧═════════════════════════╧═════════╛")
 
 # 메인 함수
 def main():
@@ -412,19 +417,19 @@ def main():
                 print("먼저 노선번호를 조회하세요.")
             input("계속하려면 아무 키나 누르세요...")
         elif a == '3':
-            route_number = input("로드할 노선번호를 입력하세요: ").strip()
-            filename = f'via_stops_{route_number}.txt'
-            try:
-                stops = load_via_stops(filename)
-                for stop, updowncd in stops:
-                    if updowncd == '0' :
-                        print(f'{stop}, 상행')
-                    elif updowncd == '1' :
-                        print(f'{stop}, 하행')
-                    else :
-                        print(f'{stop}')
-            except FileNotFoundError:
+            routenumber = input("로드할 노선번호를 입력하세요: ").strip()
+            filename = f'via_stops_{routenumber}.txt'  # Ensure the variable name matches
+            stops = load_via_stops(filename)
+            if not stops:
                 print(f'{filename} 파일을 찾을 수 없습니다.')
+            else:
+                for stop, updowncd in stops:
+                    if updowncd == '0':
+                        print(f'{stop}, 상행')
+                    elif updowncd == '1':
+                        print(f'{stop}, 하행')
+                    else:  # This part added
+                        print(f'{stop}')
             input("계속하려면 아무 키나 누르세요...")
         elif a == '4':
             # 파일명에 via_stops가 포함된 모든 파일 찾기
@@ -440,9 +445,11 @@ def main():
                     print_routes_via_station(initial_sound, filenames)
             input("계속하려면 아무 키나 누르세요...")
 
-        elif a=='5':
-            
+        elif a == '5':
             city_name = input("도시명을 입력하세요(서울시 제외, 뒤로가기: 0 입력): ")
+        
+            if city_name == '0':
+                continue  # 뒤로가기 선택 시, 다시 메뉴로 돌아감
             
             city_code = get_city_code(city_name)
 
@@ -450,21 +457,24 @@ def main():
             
             node_id = get_station_id(city_code, nodenm)
 
-
-            print(get_station_id(city_code, nodenm))
-
-
             bus_routes = get_bus_routes_via_station(city_code, node_id)
 
+            # 버스 경로 정보를 DataFrame으로 변환하고 열 이름 변경
+            df_test = pd.DataFrame(bus_routes, columns=['endnodenm', 'routeid', 'routeno', 'routetp', 'startnodenm'])
+            df_test.rename(columns={
+                'endnodenm': '종점',
+                'routeid': '노선아이디',
+                'routeno': '노선번호',
+                'routetp': '노선유형',
+                'startnodenm': '기점'
+            }, inplace=True)
             
-            
-            df_test = pd.DataFrame(bus_routes)
             print(tabulate(df_test, headers='keys', tablefmt='fancy_grid', showindex=True))
-                
-            input("계속하려면 아무 키나 누르세요...")
             
+            input("계속하려면 아무 키나 누르세요...")
         else:
             print("올바른 선택이 아닙니다. 다시 시도하세요.")
+
         
 if __name__ == "__main__":
     main()

@@ -1,0 +1,20 @@
+def KnapSack_frac(obj, W):
+    obj.sort(key=lambda o: o[2]/o[1], reverse=True)
+    totalValue=0
+    for o in obj:
+        if W <=0: break
+        if W-o[1]>=0:
+            W-=o[1]
+            totalValue+=o[2]
+        else:
+            fraction=W/o[1]
+            totalValue+=o[2]*fraction
+            W=int(W-(o[1]*fraction))
+    return totalValue
+obj = [("A",  10, 50), ("B", 12, 90), ("C", 8, 120)]
+print("W=18", obj)
+print("부분적인배낭(18): ", KnapSack_frac(obj, 18), end='\n\n')
+
+obj = [("A",  10, 50), ("B", 40, 100), ("C", 20, 30), ("D", 30, 90)]
+print("W=50", obj)
+print("부분적인배낭(50): ", KnapSack_frac(obj, 50))
